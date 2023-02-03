@@ -28,6 +28,7 @@ def server_rev():
 
 
     # Close the server socket
+    print ("[S]: Closing server socket {}".format(host))
     ss.close()
     exit()
 
@@ -39,7 +40,7 @@ def server_up():
         print('socket open error: {}\n'.format(err))
         exit()
 
-    server_binding = ('', 50007)
+    server_binding = ('', 50008)
     ss.bind(server_binding)
     ss.listen(1)
     host = socket.gethostname()
@@ -47,19 +48,23 @@ def server_up():
     localhost_ip = (socket.gethostbyname(host))
     print("[S]: Server IP address is {}".format(localhost_ip))
     csockid, addr = ss.accept()
-    print ("[S]: Got a connection request from a client weiner at {}".format(addr))
+    print ("[S]: Got a connection request from a client at {}".format(addr))
 
     start = time.time()
-    while((time.time() - start) < 1):
+    while((time.time() - start) < 5):
         clientBytes = csockid.recv(200)
         clientStr = clientBytes.decode('utf-8')
         clientStr = clientStr.upper()
         csockid.send(clientStr.encode('utf-8'))
 
     # Close the server socket
+    print ("[S]: Closing server socket {}".format(host))
     ss.close()
     exit()
 
 if __name__ == "__main__":
-    t1 = threading.Thread(name='server_up', target=server_up)
+    t1 = threading.Thread(name='server_rev', target=server_rev)
     t1.start()
+
+    t2 = threading.Thread(name='server_up', target=server_up)
+    t2.start()
