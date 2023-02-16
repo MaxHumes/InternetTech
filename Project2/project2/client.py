@@ -33,7 +33,7 @@ def write_lines_from_server(sock, in_path, out_path):
 if __name__ == "__main__":
 #Arguments for port and localhost address    
     port = int(sys.argv[1])
-    localhost_addr = (sys.argv[2])
+    localhost_addr = str(sys.argv[2])
     client()
     
 
