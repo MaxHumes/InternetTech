@@ -1,5 +1,5 @@
 import socket
-import threading
+
 
 def client():
     # Define ports for reverse and upper servers
@@ -34,5 +34,4 @@ def write_lines_from_server(sock, in_path, out_path):
 
 if __name__ == "__main__":
     client()
-  #  t2 = threading.Thread(name='client', target=client)
-  # t2.start()
+
