@@ -1,38 +1,33 @@
 import threading
 import socket
+import sys
 import time
 
 def server():
     try:
         ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("[S]: Server socket created")
+        print("[ts1]: TS1 socket created")
     except socket.error as err:
         print('socket open error: {}\n'.format(err))
         exit()
 
-    server_binding = ('', 50009)
-    ss.bind(server_binding)
-    ss.listen(1)
-    host = socket.gethostname()
-    print("[S]: Server host name is {}".format(host))
-    localhost_ip = (socket.gethostbyname(host))
-    print("[S]: Server IP address is {}".format(localhost_ip))
-    csockid, addr = ss.accept()
-    print ("[S]: Got a connection request from a client at {}".format(addr))
-
-#Create a dictionary to store the data
-#Stores key: google.com value: Address
+    #Create a dictionary to store the data
+    #Stores key: Domain Name value: Address
     with open('ip.txt', 'r') as f:
         data_dict = {}
         for line in f:
             key, value = line.strip().split()
             data_dict[key] = value
+    print(data_dict)
 
-    print(data_dict)      
+    server_binding = ('', int(sys.argv[1]))
+    ss.bind(server_binding)
+    ss.listen(1)
+    csockid, addr = ss.accept()
+    print ("[ts1]: Got a connection request from a client at {}".format(addr))     
 
-#maybe an issue down here
-    start = time.time()
-    while((time.time() - start) < 5):
+    #maybe an issue down here
+    while True:
         client_bytes = csockid.recv(200)
         if(len(client_bytes) == 0):
             break
@@ -43,16 +38,12 @@ def server():
             response_str = client_str + ' ' +  data_dict[client_str] + ' IN'
             response_bytes = response_str.encode('utf-8')
             csockid.send(response_bytes)
-        else:
-            #Send no Bytes (its empty I think)
-            csockid.send(b'')
- 
-        print ("[S]: Closing server socket {}".format(host))
-        ss.close()
-        exit()
+        #otherwise don't send anything
+        
+    print ("[ts]: Closing TS1 socket {}".format(host))
+    ss.close()
+    exit()
 
 if __name__ == "__main__":
     t1 = threading.Thread(name='server', target=server)
     t1.start()
-
-
