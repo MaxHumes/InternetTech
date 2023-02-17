@@ -40,7 +40,7 @@ def ts1():
             csockid.send(response_bytes)
         #otherwise don't send anything
 
-    print ("[ts]: Closing TS1 socket {}".format(host))
+    print ("[ts2]: Closing TS1 socket {}".format(host))
     ss.close()
     exit()
 

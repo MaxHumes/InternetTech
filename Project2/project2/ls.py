@@ -18,7 +18,7 @@ def ls():
     csockid, addr = lssock.accept()
     print ("[ls]: Got a connection request from a client at {}".format(addr))
 
-
+    #get socket for ts1 and ts2
     ts1sock = get_ts_socket(sys.argv[2], sys.argv[3])
     ts2sock = get_ts_socket(sys.argv[4], sys.argv[5])
     print("[ls]: Connected to TS servers")
