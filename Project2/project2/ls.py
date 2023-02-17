@@ -37,7 +37,8 @@ def ls():
         ts2data = ts2.recv(200)
 
         #block with select and wait for timeout
-        if all(not l for l in select.select([ts1sock, ts2sock],[],[],5)):
+        r,w,e = select.select([ts1sock, ts2sock],[],[],5)
+        if not r:
             #timeout
             timeout_str = '{} - TIMED OUT'.format(clientBytes.decode('utf-8'))
             csockid.send(timeout_str.encode('utf-8'))

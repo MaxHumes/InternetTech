@@ -3,8 +3,6 @@ import sys
 
 
 def client():
-
-
     try:
         csr = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[C]: Client socket created")
@@ -13,7 +11,7 @@ def client():
         exit()
 
     # connect to to the LS
-    server_binding = (localhost_addr, port)
+    server_binding = (sys.argv[1], sys.argv[2])
     csr.connect(server_binding)
 
     write_lines_from_server(csr, 'PROJ2-HNS.txt', 'RESOLVED.txt')
@@ -32,9 +30,5 @@ def write_lines_from_server(sock, in_path, out_path):
             out_file.write(data_from_server.decode('utf-8').strip() + '\n')
 
 if __name__ == "__main__":
-#Arguments for port and localhost address    
-    port = int(sys.argv[1])
-    localhost_addr = str(sys.argv[2])
+#Arguments for port and localhost address
     client()
-    
-
