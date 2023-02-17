@@ -13,8 +13,8 @@ def ls():
         exit()
     
     #get socket for ts1 and ts2
-    ts1sock = get_ts_socket(sys.argv[2], sys.argv[3])
-    ts2sock = get_ts_socket(sys.argv[4], sys.argv[5])
+    ts1sock = get_ts_socket(sys.argv[2], int(sys.argv[3]))
+    ts2sock = get_ts_socket(sys.argv[4], int(sys.argv[5]))
     print("[ls]: Connected to TS servers")
 
     #listen for client connection
