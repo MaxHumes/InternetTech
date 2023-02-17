@@ -3,7 +3,7 @@ import socket
 import sys
 import time
 
-def server():
+def ts1():
     try:
         ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[ts1]: TS1 socket created")
@@ -39,11 +39,14 @@ def server():
             response_bytes = response_str.encode('utf-8')
             csockid.send(response_bytes)
         #otherwise don't send anything
-        
+
     print ("[ts]: Closing TS1 socket {}".format(host))
     ss.close()
     exit()
 
 if __name__ == "__main__":
-    t1 = threading.Thread(name='server', target=server)
+    if len(sys.argv) < 2:
+        print('Error: Not enough arguments provided')
+        exit()
+    t1 = threading.Thread(name='ts1', target=ts1)
     t1.start()

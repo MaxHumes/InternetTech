@@ -75,4 +75,5 @@ if __name__ == "__main__":
     if len(sys.argv) < 6:
         print('Error: Not enough arguments provided')
         exit()
-    ls()
+    t1 = threading.Thread(name='ls', target=ls)
+    t1.start()

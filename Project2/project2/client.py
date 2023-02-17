@@ -30,5 +30,8 @@ def write_lines_from_server(sock, in_path, out_path):
             out_file.write(data_from_server.decode('utf-8').strip() + '\n')
 
 if __name__ == "__main__":
-#Arguments for port and localhost address
-    client()
+    if len(sys.argv) < 3:
+        print('Error: Not enough arguments provided')
+        exit()
+    t1 = threading.Thread(name='client', target=client)
+    t1.start()
