@@ -11,17 +11,18 @@ def ls():
     except socket.error as err:
         print('socket open error: {}\n'.format(err))
         exit()
+    
+    #get socket for ts1 and ts2
+    ts1sock = get_ts_socket(sys.argv[2], sys.argv[3])
+    ts2sock = get_ts_socket(sys.argv[4], sys.argv[5])
+    print("[ls]: Connected to TS servers")
+
     #listen for client connection
     server_binding = ('', int(sys.argv[1]))
     lssock.bind(server_binding)
     lssock.listen(1)
     csockid, addr = lssock.accept()
     print ("[ls]: Got a connection request from a client at {}".format(addr))
-
-    #get socket for ts1 and ts2
-    ts1sock = get_ts_socket(sys.argv[2], sys.argv[3])
-    ts2sock = get_ts_socket(sys.argv[4], sys.argv[5])
-    print("[ls]: Connected to TS servers")
 
     csockid.setblocking(0)
     while True:
