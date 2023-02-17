@@ -13,11 +13,11 @@ def ts1():
 
     #Create a dictionary to store the data
     #Stores key: Domain Name value: Address
-    with open('ip.txt', 'r') as f:
+    with open('PROJ2-DNSTS1.txt', 'r') as f:
         data_dict = {}
         for line in f:
-            key, value = line.strip().split()
-            data_dict[key] = value
+            domain, ip, t = line.strip().split()
+            data_dict[domain] = ip
     print(data_dict)
 
     server_binding = ('', int(sys.argv[1]))
