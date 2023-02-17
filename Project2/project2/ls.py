@@ -24,20 +24,22 @@ def ls():
     csockid, addr = lssock.accept()
     print ("[ls]: Got a connection request from a client at {}".format(addr))
 
-    csockid.setblocking(0)
     while True:
         #recieve domain name from client
         clientBytes = csockid.recv(200)
         if len(clientBytes) == 0:
             break
 
+        csockid.setblocking(0)
         #send bytes to TS1
         ts1sock.send(clientBytes)
         ts1data = ts1sock.recv(200)
+        print('Sent to ts1')
         #send bytes to TS2
         ts2sock.send(clientBytes)
-        ts2data = ts2.recv(200)
-
+        ts2data = ts2sock.recv(200)
+        print('Sent to ts2')
+    
         #block with select and wait for timeout
         r,w,e = select.select([ts1sock, ts2sock],[],[],5)
         if not r:
@@ -50,7 +52,7 @@ def ls():
                 csockid.send(ts1data)
             else:
                 csockid.sent(ts2data)
-
+        csockid.setblocking(1)
 
 
     # Close the server socket
