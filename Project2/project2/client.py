@@ -12,7 +12,7 @@ def client():
         exit()
 
     # connect to to the LS
-    server_binding = (sys.argv[1], sys.argv[2])
+    server_binding = (sys.argv[1], int(sys.argv[2]))
     csr.connect(server_binding)
 
     write_lines_from_server(csr, 'PROJ2-HNS.txt', 'RESOLVED.txt')
