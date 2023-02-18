@@ -25,10 +25,8 @@ def client():
 def write_lines_from_server(sock, in_path, out_path):
     lines = []
     with open(in_path, 'r') as in_file, open(out_path, 'w') as out_file:
-        i = 1
         for line in in_file:
             sock.send(line.encode('utf-8'))
-            print('Sent line {}'.format(i))
             data_from_server=sock.recv(200)
             out_file.write(data_from_server.decode('utf-8').strip() + '\n')
 

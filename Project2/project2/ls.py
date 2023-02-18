@@ -32,10 +32,8 @@ def ls():
 
         #send bytes to TS1
         ts1sock.send(clientBytes)
-        #ts1data = ts1sock.recv(200)
         #send bytes to TS2
         ts2sock.send(clientBytes)
-        #ts2data = ts2sock.recv(200)
     
         #block with select and wait for timeout
         r,w,e = select.select([ts1sock, ts2sock],[],[],5)
@@ -45,16 +43,9 @@ def ls():
             csockid.send(timeout_str.encode('utf-8'))
         else:
             csockid.send(r[0].recv(200))
-            '''
-            #return domain name
-            if len(ts1data) > 0:
-                csockid.send(ts1data)
-            else:
-                csockid.sent(ts2data)
-            '''
 
     # Close the server socket
-    print ("[ls]: Closing load balancing server socket {}".format(host))
+    print ("[ls]: Closing load balancing server socket")
     ss.close()
     exit()
 

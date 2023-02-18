@@ -39,7 +39,7 @@ def ts1():
             response_bytes = response_str.encode('utf-8')
             csockid.send(response_bytes)
         #otherwise don't send anything
-        print('weiner')
+
     print ("[ts2]: Closing TS1 socket")
     ss.close()
     exit()
