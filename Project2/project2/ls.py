@@ -46,7 +46,8 @@ def ls():
 
     # Close the server socket
     print ("[ls]: Closing load balancing server socket")
-    ss.close()
+    #was ss not lssock (changed this)
+    lssock.close()
     exit()
 
 def get_ts_socket(host_name, listen_port):
