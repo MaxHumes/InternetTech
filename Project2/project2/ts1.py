@@ -17,7 +17,8 @@ def ts1():
         data_dict = {}
         for line in f:
             domain, ip, t = line.strip().split()
-            data_dict[domain] = ip
+            #fixed issue here it was missing the 'A'
+            data_dict[domain] = ip + ' ' + t
     print(data_dict)
 
     server_binding = ('', int(sys.argv[1]))
