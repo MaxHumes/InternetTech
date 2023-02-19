@@ -17,7 +17,7 @@ def ts2():
         data_dict = {}
         for line in f:
             domain, ip, t = line.strip().split()
-            data_dict[domain] = ip
+            data_dict[domain] = ip + ' ' + t
     print(data_dict)
 
     server_binding = ('', int(sys.argv[1]))
