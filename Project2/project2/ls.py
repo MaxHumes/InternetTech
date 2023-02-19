@@ -38,8 +38,8 @@ def ls():
         #block with select and wait for timeout
         r,w,e = select.select([ts1sock, ts2sock],[],[],5)
         if not r:
-            #timeout
-            timeout_str = '{} - TIMED OUT'.format(clientBytes.decode('utf-8'))
+            #timeout. (I added .strip because TIMED OUT was printing under) 
+            timeout_str = '{} - TIMED OUT'.format(clientBytes.decode('utf-8').strip())
             csockid.send(timeout_str.encode('utf-8'))
         else:
             csockid.send(r[0].recv(200))
