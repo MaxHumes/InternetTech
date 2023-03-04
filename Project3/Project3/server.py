@@ -75,9 +75,19 @@ signal.signal(signal.SIGINT, sigint_handler)
 # TODO: put your application logic here!
 # Read login credentials for all the users
 # Read secret data of all the users
+def lines_to_dict(file):
+    new_dict = {}
+    for line in file:
+        tup = line.split()
+        if(len(tup) > 1):
+            new_dict[tup[0]] = tup[1]
+    return new_dict
+with open('passwords.txt', 'r') as pass_file, open('secrets.txt','r') as secret_file:
+    pass_dict = lines_to_dict(pass_file)
+    secret_dict = lines_to_dict(secret_file)
 
-
-
+print(pass_dict)
+print(secret_dict)
 
 ### Loop to accept incoming HTTP connections and respond.
 while True:
