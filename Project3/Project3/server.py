@@ -79,15 +79,12 @@ def lines_to_dict(file):
     new_dict = {}
     for line in file:
         tup = line.split()
-        if(len(tup) > 1):
+        if len(tup) > 1:
             new_dict[tup[0]] = tup[1]
     return new_dict
 with open('passwords.txt', 'r') as pass_file, open('secrets.txt','r') as secret_file:
     pass_dict = lines_to_dict(pass_file)
     secret_dict = lines_to_dict(secret_file)
-
-print(pass_dict)
-print(secret_dict)
 
 ### Loop to accept incoming HTTP connections and respond.
 while True:
@@ -103,17 +100,46 @@ while True:
 
     # TODO: Put your application logic here!
     # Parse headers and body and perform various actions
+    
+    #returns content to send
+    def parse_HTTP_body(content):
+        #split body by fields
+        body_fields = content.split('&')
+        if len(body_fields) == 1:
+            if not body_fields[0]:
+                return login_page
+            return bad_creds_page
+        else:
+            username = ''
+            password = ''
+            #loop through fields in request body
+            for field in body_fields:
+                #determine field name and value
+                field_val = field.split('=')
+                if len(field_val) > 1:
+                    if field_val[0] == 'username':
+                        username = field_val[1]
+                    elif field_val[0] == 'password':
+                        password = field_val[1]
+                    else:
+                        return bad_creds_page
+                else:
+                    return bad_creds_page
+            
+            #authenticate password       
+            if not(username in pass_dict and password == pass_dict[username]):
+                return bad_creds_page
+            return success_page + secret_dict[username]
 
     # You need to set the variables:
     # (1) `html_content_to_send` => add the HTML content you'd
     # like to send to the client.
     # Right now, we just send the default login page.
-    html_content_to_send = login_page
     # But other possibilities exist, including
     # html_content_to_send = success_page + <secret>
     # html_content_to_send = bad_creds_page
     # html_content_to_send = logout_page
-    
+    html_content_to_send = parse_HTTP_body(body)
     # (2) `headers_to_send` => add any additional headers
     # you'd like to send the client?
     # Right now, we don't send any extra headers.
