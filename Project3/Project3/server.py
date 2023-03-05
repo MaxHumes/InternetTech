@@ -3,6 +3,12 @@ import signal
 import sys
 import random
 
+from enum import Enum
+class Status(Enum):
+    LOGIN = 1
+    FAILURE = 2
+    SUCCESS = 3
+
 # Read a command line argument for the port where the server
 # must run.
 port = 8080
@@ -86,6 +92,9 @@ with open('passwords.txt', 'r') as pass_file, open('secrets.txt','r') as secret_
     pass_dict = lines_to_dict(pass_file)
     secret_dict = lines_to_dict(secret_file)
 
+#dictionary mapping cookies to users
+cookies_dict = {}
+
 ### Loop to accept incoming HTTP connections and respond.
 while True:
     client, addr = sock.accept()
@@ -101,14 +110,25 @@ while True:
     # TODO: Put your application logic here!
     # Parse headers and body and perform various actions
     
-    #returns content to send
+    #returns cookie from header and empty string if there is none
+    def parse_HTTP_header_for_cookie(header):
+        for line in header.splitlines():
+            field_val = line.split(':')
+            if len(field_val) > 1:
+                if field_val[0] == 'Cookie':
+                    token_val = field_val[1].split('=')
+                    if len(token_val) > 1:
+                        return token_val[1]
+        return ''
+    #returns status code, username, password triple
+    #username and password returned as emptystrings on failure
     def parse_HTTP_body(content):
         #split body by fields
         body_fields = content.split('&')
         if len(body_fields) == 1:
             if not body_fields[0]:
-                return login_page
-            return bad_creds_page
+                return Status.LOGIN, '', ''
+            return Status.FAILURE, '', ''
         else:
             username = ''
             password = ''
@@ -122,15 +142,14 @@ while True:
                     elif field_val[0] == 'password':
                         password = field_val[1]
                     else:
-                        return bad_creds_page
+                        return Status.FAILURE, '', ''
                 else:
-                    return bad_creds_page
+                    return Status.FAILURE, '', ''
             
             #authenticate password       
             if not(username in pass_dict and password == pass_dict[username]):
-                return bad_creds_page
-            return success_page + secret_dict[username]
-
+                return Status.FAILURE
+            return Status.SUCCESS, username, password        
     # You need to set the variables:
     # (1) `html_content_to_send` => add the HTML content you'd
     # like to send to the client.
@@ -138,12 +157,30 @@ while True:
     # But other possibilities exist, including
     # html_content_to_send = success_page + <secret>
     # html_content_to_send = bad_creds_page
-    # html_content_to_send = logout_page
-    html_content_to_send = parse_HTTP_body(body)
-    # (2) `headers_to_send` => add any additional headers
-    # you'd like to send the client?
-    # Right now, we don't send any extra headers.
-    headers_to_send = ''
+    # html_content_to_send = logout_page    
+    
+    html_content_to_send,headers_to_send='',''
+    cookie = parse_HTTP_header_for_cookie(headers)
+    if cookie and cookie in cookies_dict:
+        html_content_to_send = success_page + secret_dict[cookies_dict[cookie]]
+    elif cookie and not(cookie in cookies_dict):
+        html_content_to_send = bad_creds_page
+    else:
+        #determine html content to send
+        status, username, password = parse_HTTP_body(body)
+        if status == Status.LOGIN:
+            html_content_to_send = login_page
+        elif status == Status.FAILURE:
+            html_content_to_send = bad_creds_page
+        elif status == Status.SUCCESS:
+            html_content_to_send = success_page + secret_dict[username]
+            # (2) `headers_to_send` => add any additional headers
+            # you'd like to send the client?
+            rand_val = random.getrandbits(64)
+            token = str(rand_val)
+            cookies_dict[token] = username 
+            headers_to_send = 'Set-Cookie: token=' + token + '\r\n'
+    
 
     # Construct and send the final response
     response  = 'HTTP/1.1 200 OK\r\n'
