@@ -187,7 +187,7 @@ while True:
     if(body[:11]) == 'NewPassword':
             newPass = body[12:len(body)]
             pass_dict[username] = newPass
-            html_content_to_send = success_page
+            html_content_to_send = success_page + secret_dict[username]
             print(pass_dict)
 
             with open('passwords.txt', 'w') as file:
