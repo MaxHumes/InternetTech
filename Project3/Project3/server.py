@@ -180,6 +180,20 @@ while True:
             token = str(rand_val)
             cookies_dict[token] = username 
             headers_to_send = 'Set-Cookie: token=' + token + '\r\n'
+            
+            
+    if(body) == 'password=new':
+            html_content_to_send = new_password_page
+    if(body[:11]) == 'NewPassword':
+            newPass = body[12:len(body)]
+            pass_dict[username] = newPass
+            html_content_to_send = success_page
+            print(pass_dict)
+
+            with open('passwords.txt', 'w') as file:
+                for key, value in pass_dict.items():
+                    file.write("%s %s\n" % (key, value))
+    
     
 
     # Construct and send the final response
