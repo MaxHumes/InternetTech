@@ -148,7 +148,7 @@ while True:
             
             #authenticate password       
             if not(username in pass_dict and password == pass_dict[username]):
-                return Status.FAILURE
+                return Status.FAILURE, '', ''
             return Status.SUCCESS, username, password        
     # You need to set the variables:
     # (1) `html_content_to_send` => add the HTML content you'd
