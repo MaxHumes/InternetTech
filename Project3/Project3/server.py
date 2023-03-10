@@ -2,6 +2,7 @@ import socket
 import signal
 import sys
 import random
+import time
 
 from enum import Enum
 class Status(Enum):
@@ -184,7 +185,7 @@ while True:
             
     if(body) == 'password=new':
             html_content_to_send = new_password_page
-    if(body[:11]) == 'NewPassword':
+    elif(body[:11]) == 'NewPassword':
             newPass = body[12:len(body)]
             pass_dict[username] = newPass
             html_content_to_send = success_page + secret_dict[username]
@@ -193,6 +194,15 @@ while True:
             with open('passwords.txt', 'w') as file:
                 for key, value in pass_dict.items():
                     file.write("%s %s\n" % (key, value))
+    elif(body == "action=logout"):
+        token = ""
+        for key,val in cookies_dict.items():
+            if val == username:
+                token =  key
+        expires = time.strftime("%a, %d-%b-%Y %H:%M:%S GMT", time.gmtime())
+        headers_to_send = 'Set-Cookie: token=;' + token + 'Expires=' + expires + '\r\n'
+        html_content_to_send = logout_page
+
     
     
 
