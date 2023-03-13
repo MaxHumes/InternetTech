@@ -151,6 +151,7 @@ while True:
             if not(username in pass_dict and password == pass_dict[username]):
                 return Status.FAILURE, '', ''
             return Status.SUCCESS, username, password        
+    
     # You need to set the variables:
     # (1) `html_content_to_send` => add the HTML content you'd
     # like to send to the client.
@@ -159,15 +160,16 @@ while True:
     # html_content_to_send = success_page + <secret>
     # html_content_to_send = bad_creds_page
     # html_content_to_send = logout_page    
-    
+   
     html_content_to_send,headers_to_send='',''
     cookie = parse_HTTP_header_for_cookie(headers)
+    #check for valid token cookie
     if cookie and cookie in cookies_dict:
         html_content_to_send = success_page + secret_dict[cookies_dict[cookie]]
     elif cookie and not(cookie in cookies_dict):
         html_content_to_send = bad_creds_page
     else:
-        #determine html content to send
+        #otherwise, determine html content to send
         status, username, password = parse_HTTP_body(body)
         if status == Status.LOGIN:
             html_content_to_send = login_page
@@ -175,14 +177,13 @@ while True:
             html_content_to_send = bad_creds_page
         elif status == Status.SUCCESS:
             html_content_to_send = success_page + secret_dict[username]
-            # (2) `headers_to_send` => add any additional headers
-            # you'd like to send the client?
+            #send randomly generated token cookie in HTTP header 
             rand_val = random.getrandbits(64)
             token = str(rand_val)
             cookies_dict[token] = username 
             headers_to_send = 'Set-Cookie: token=' + token + '\r\n'
             
-            
+    #determine if user wishes to set password
     if(body) == 'password=new':
             html_content_to_send = new_password_page
     elif(body[:11]) == 'NewPassword':
@@ -194,6 +195,7 @@ while True:
             with open('passwords.txt', 'w') as file:
                 for key, value in pass_dict.items():
                     file.write("%s %s\n" % (key, value))
+    #determine if user wishes to logout
     elif(body == "action=logout"):
         token = ""
         for key,val in cookies_dict.items():
@@ -203,8 +205,6 @@ while True:
         headers_to_send = 'Set-Cookie: token=;' + token + 'Expires=' + expires + '\r\n'
         html_content_to_send = logout_page
 
-    
-    
 
     # Construct and send the final response
     response  = 'HTTP/1.1 200 OK\r\n'
