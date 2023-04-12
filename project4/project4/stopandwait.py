@@ -4,7 +4,6 @@ import random
 import socket
 import select
 import argparse
-import pdb
 from functools import reduce
 
 # Settings
