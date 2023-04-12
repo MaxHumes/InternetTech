@@ -108,7 +108,7 @@ def parse_args():
     parser.add_argument('--port',
                         type = int,
                         help = "receiver port to connect to (default 50007)",
-                        default = 50007)
+                        default = 50008) #50007
     parser.add_argument('--infile',
                         type = str,
                         help = "name of input file (default test-input.txt)",
@@ -116,7 +116,7 @@ def parse_args():
     parser.add_argument('--winsize',
                         type = int,
                         help = "Window size to use in pipelined reliability",
-                        default = 20)
+                        default = 7000)
     args = parser.parse_args()
     return vars(args)
 
@@ -169,11 +169,13 @@ def send_reliable(cs, filedata, receiver_binding, win_size):
 
     # TODO: This is where you will make your changes. You
     # will not need to change any other parts of this file.
-    while True:
-        last_ack = 8
-        final_ack = INIT_SEQNO + content_len
-        transmit_entire_window_from(win_left_edge)
 
+    while True:
+        final_ack = INIT_SEQNO + content_len
+        last_ack = transmit_one()
+        temp = -1
+        counter = 0
+       
         while last_ack < final_ack:
             r, w, e = select.select([cs], [], [], RTO)
 
@@ -181,27 +183,33 @@ def send_reliable(cs, filedata, receiver_binding, win_size):
                 data_from_receiver, receiver_addr = cs.recvfrom(100)
                 ack_msg = Msg.deserialize(data_from_receiver)
                 current_ack = ack_msg.ack
-                print(current_ack)
-
+            
+            
                 if current_ack > last_ack:
                     last_ack = current_ack
                     win_left_edge = last_ack
                     win_right_edge = min(win_left_edge + win_size, final_ack)
                     transmit_entire_window_from(win_left_edge)
-                   
+               
+            
             else:
-                data_from_receiver, receiver_addr = cs.recvfrom(100)
-                ack_msg = Msg.deserialize(data_from_receiver)
-                current_ack = ack_msg.ack
-                last_ack = current_ack
-                transmit_one()
-     
-                   
+                if(temp == last_ack):
+                    counter = counter + 1
+                else:
+                    temp = last_ack
 
-        print("FINISHED")
+
+                if(counter == 3):
+                    print("Transmitting Over: All packets have been sent" )
+                    break
+                print("Transmit Once")
+                transmit_one()    
+                win_left_edge = last_ack 
+               
+
         break
 
-      
+
 if __name__ == "__main__":
     args = parse_args()
     filedata = get_filedata(args['infile'])
