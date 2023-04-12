@@ -3,6 +3,7 @@ import time
 import random
 import socket
 import argparse
+import pdb
 
 # Settings
 # Maximum chunk size used for transmission.
@@ -270,9 +271,33 @@ def receiver(ss, ooo_enabled):
     last_seq_expected = msg.seq + len(msg.msg) + total_bytes - 1
     last_acked = msg.seq + msg.len
 
+    test_username = True
     while last_acked <= last_seq_expected:
         msg, ack_msg, sender_addr = get_msg_ack()
         last_seq_in_msg = msg.seq + msg.len - 1
+        
+        #user authentication code
+        if test_username:
+            if msg.msg.startswith("UN@"):
+                username = msg.msg[3:]
+                write_username = False
+                
+                #read username file and check if username is in there
+                with open("UN.txt", 'r') as un_file:
+                    usernames = [line.rstrip() for line in un_file]
+                    if username in usernames:
+                        print("Username found: {}".format(username))
+                    else:
+                        write_username = True
+                        print("Username not found")
+                #write username if not in file
+                if write_username:
+                    with open("UN.txt", 'a') as un_file:
+                            un_file.write(username + '\n')    
+            else:
+                print("Username not found")
+            test_username = False
+
         if last_acked == msg.seq:
             # Most common case: fresh in-order data
             # add to existing data buffer
