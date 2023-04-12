@@ -169,9 +169,39 @@ def send_reliable(cs, filedata, receiver_binding, win_size):
 
     # TODO: This is where you will make your changes. You
     # will not need to change any other parts of this file.
-    while win_left_edge < INIT_SEQNO + content_len:
-        win_left_edge = transmit_one()
+    while True:
+        last_ack = 8
+        final_ack = INIT_SEQNO + content_len
+        transmit_entire_window_from(win_left_edge)
 
+        while last_ack < final_ack:
+            r, w, e = select.select([cs], [], [], RTO)
+
+            if r:
+                data_from_receiver, receiver_addr = cs.recvfrom(100)
+                ack_msg = Msg.deserialize(data_from_receiver)
+                current_ack = ack_msg.ack
+                print(current_ack)
+
+                if current_ack > last_ack:
+                    last_ack = current_ack
+                    win_left_edge = last_ack
+                    win_right_edge = min(win_left_edge + win_size, final_ack)
+                    transmit_entire_window_from(win_left_edge)
+                   
+            else:
+                data_from_receiver, receiver_addr = cs.recvfrom(100)
+                ack_msg = Msg.deserialize(data_from_receiver)
+                current_ack = ack_msg.ack
+                last_ack = current_ack
+                transmit_one()
+     
+                   
+
+        print("FINISHED")
+        break
+
+      
 if __name__ == "__main__":
     args = parse_args()
     filedata = get_filedata(args['infile'])
