@@ -108,7 +108,7 @@ def parse_args():
     parser.add_argument('--port',
                         type = int,
                         help = "receiver port to connect to (default 50007)",
-                        default = 50008) #50007
+                        default = 50007) 
     parser.add_argument('--infile',
                         type = str,
                         help = "name of input file (default test-input.txt)",
@@ -116,7 +116,7 @@ def parse_args():
     parser.add_argument('--winsize',
                         type = int,
                         help = "Window size to use in pipelined reliability",
-                        default = 7000)
+                        default = 20)
     args = parser.parse_args()
     return vars(args)
 
@@ -183,25 +183,24 @@ def send_reliable(cs, filedata, receiver_binding, win_size):
                 data_from_receiver, receiver_addr = cs.recvfrom(100)
                 ack_msg = Msg.deserialize(data_from_receiver)
                 current_ack = ack_msg.ack
-            
-            
+           
                 if current_ack > last_ack:
                     last_ack = current_ack
                     win_left_edge = last_ack
                     win_right_edge = min(win_left_edge + win_size, final_ack)
                     transmit_entire_window_from(win_left_edge)
-               
-            
+
             else:
+        
                 if(temp == last_ack):
-                    counter = counter + 1
+                   counter = counter + 1
                 else:
-                    temp = last_ack
-
-
-                if(counter == 3):
-                    print("Transmitting Over: All packets have been sent" )
+                   temp = last_ack
+                
+                if(counter == 10):
+                    print("Finish Transmission")
                     break
+                    
                 print("Transmit Once")
                 transmit_one()    
                 win_left_edge = last_ack 
